@@ -1,0 +1,9 @@
+1.撰寫基本的 http 訪問網頁  Jmeter 腳本
+
+2.加入 Beanshell 監聽
+
+3.建立Pipeline專案
+
+4.撰寫 Pipeline 腳本
+
+5.設定定期任務
