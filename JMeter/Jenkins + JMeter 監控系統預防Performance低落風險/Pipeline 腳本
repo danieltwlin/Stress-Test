@@ -1,0 +1,25 @@
+node {
+	stage("run"){
+	    
+	    //刪除之前測試結果
+	    deleteDir()
+
+		//apache-jmeter目錄
+		env.JMETER_HOME="D:\\jmeter\\apache-jmeter-4.0"
+		
+
+		//使用Jmeter並讀取thinkpower.jmx腳本進行Performance測試		
+	           bat " \"D:\\jmeter\\apache-jmeter-4.0\\bin\\jmeter.bat\" -Jjmeter.save.saveservice.output_format=xml -n -t D:\\ies_monitor.jmx -l ies_monitor.jtl "
+
+		//產生Jmeter報表，如果average response time超過JMeter中BeanShell Listener的設定，就編譯失敗或是不穩定的圖示。
+		perfReport errorFailedThreshold: 100, errorUnstableThreshold: 49, percentiles: '0,50,90,100', sourceDataFiles:'ies_monitor.jtl'
+		
+		//若response time超過指定的數值，就會發mail通知管理者
+		if (currentBuild.currentResult=='UNSTABLE') {
+	      	  def mailList="daniel@habook.com.tw";
+                         def subject='系統警告-Performance低落風險';
+        	             def body="<font size='23'>Performance低落風險</font>";
+        	             emailext body: "${body}", subject: "${subject}", to: "${mailList}",mimeType: 'text/html';
+		}
+	}
+}
